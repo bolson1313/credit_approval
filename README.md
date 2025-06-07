@@ -2,35 +2,6 @@
 
 Kompleksowa aplikacja do analizy, przetwarzania i wizualizacji danych CSV za pomocą Streamlit.
 
-## 🐛 Rozwiązywanie problemów
-
-### Częste problemy:
-
-1. **Błąd importu modułów**:
-   - Upewnij się, że struktura katalogów jest prawidłowa
-   - Dodaj pusty plik `__init__.py` w katalogu `src/`
-
-2. **Błędy z danymi**:
-   - Sprawdź kodowanie pliku CSV (UTF-8)
-   - Upewnij się, że separatorem jest przecinek
-
-3. **Problemy z wykresami**:
-   - Sprawdź czy wybrane kolumny zawierają odpowiednie typy danych
-   - Dla wykresów kołowych użyj danych kategorycznych
-
-### Wskazówki:
-
-- **Duże pliki**: Użyj filtrów i paginacji dla lepszej wydajności
-- **Brakujące dane**: Sprawdź statystyki przed przetwarzaniem
-- **Korelacje**: Wybierz maksymalnie 10 kolumn dla czytelności
-
-## 📝 Przykładowe dane
-
-Aplikacja najlepiej działa z danymi zawierającymi:
-- **Kolumny numeryczne**: dla statystyk i wykresów
-- **Kolumny kategoryczne**: dla filtrowania i grupowania
-- **Daty**: dla wykresów czasowych
-
 ### Format pliku CSV:
 ```csv
 Name,Age,City,Salary,Department
@@ -39,71 +10,6 @@ Anna,30,Krakow,6000,HR
 Peter,35,Gdansk,7000,IT
 ```
 
-## 🔧 Konfiguracja
-
-### Dostosowanie aplikacji:
-
-1. **Zmiana motywu**: Edytuj `.streamlit/config.toml`
-2. **Dodanie logo**: Umieść w katalogu `assets/`
-3. **Nowe moduły**: Dodaj w katalogu `src/`
-
-### Parametry w `app.py`:
-```python
-st.set_page_config(
-    page_title="Twoja Aplikacja",
-    page_icon="📊",
-    layout="wide"
-)
-```
-
-## 📚 API Reference
-
-### utils.py
-- `load_data(file)` - Wczytuje CSV
-- `parse_indices(string)` - Parsuje indeksy
-- `get_numeric_columns(df)` - Zwraca kolumny numeryczne
-- `paginate_dataframe(df)` - Paginacja danych
-
-### statistics.py
-- `StatisticsModule.render(df)` - Renderuje statystyki
-- `_pearson_correlation(df)` - Korelacja Pearsona
-- `_spearman_correlation(df)` - Korelacja Spearmana
-
-### processing.py
-- `ProcessingModule.render(df)` - Renderuje przetwarzanie
-- `_handle_missing_data(df)` - Obsługa braków
-- `_handle_scaling(df)` - Skalowanie danych
-
-### visualization.py
-- `VisualizationModule.render(df)` - Renderuje wykresy
-- `_create_[chart_type](df, options)` - Tworzy wykresy
-
-## 🤝 Współpraca
-
-Aby przyczynić się do rozwoju projektu:
-
-1. **Fork** repozytorium
-2. **Utwórz branch** dla nowej funkcjonalności
-3. **Dodaj testy** dla nowego kodu
-4. **Wyślij Pull Request**
-
-### Zasady kodowania:
-- Używaj docstringów dla funkcji
-- Przestrzegaj PEP 8
-- Dodawaj komentarze dla skomplikowanej logiki
-- Testuj przed commitowaniem
-
-## 📄 Licencja
-
-MIT License - zobacz plik LICENSE dla szczegółów.
-
-## 👨‍💻 Autor
-
-Aplikacja stworzona jako kompletne rozwiązanie do analizy danych w Streamlit.
-
----
-
-**Uwaga**: Aplikacja jest ciągle rozwijana. Zgłaszaj błędy i sugestie przez Issues.🚀 Funkcjonalności
 
 ### 📈 Statystyki
 - **Wczytywanie plików CSV** z paginacją i filtrowaniem
