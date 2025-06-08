@@ -2,3 +2,5 @@
 /logs/
 /.idea/
 /src/__pycache__/
+/dist/
+/build/
