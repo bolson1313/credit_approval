@@ -10,12 +10,10 @@ class VisualizationModule:
     def __init__(self):
         self.chart_types = {
             'Wykres słupkowy': self._create_bar_chart,
-            'Wykres liniowy': self._create_line_chart,
             'Wykres punktowy': self._create_scatter_plot,
             'Wykres kołowy': self._create_pie_chart,
             'Histogram': self._create_histogram,
             'Wykres pudełkowy': self._create_box_plot,
-            'Mapa cieplna': self._create_heatmap,
             'Wykres skrzypcowy': self._create_violin_plot
         }
     
@@ -92,27 +90,6 @@ class VisualizationModule:
                     key="bar_color"
                 )
         
-        elif chart_type == 'Wykres liniowy':
-            if len(numeric_cols) < 1:
-                st.warning("Wykres liniowy wymaga co najmniej jednej kolumny numerycznej.")
-                return None
-            
-            # Jeśli mamy kolumny daty/indeks, użyj ich jako X
-            date_cols = df.select_dtypes(include=['datetime64']).columns.tolist()
-            x_options = date_cols + numeric_cols + list(range(len(df)))
-            
-            if date_cols:
-                options['x'] = st.selectbox("Oś X:", date_cols + ["Indeks"], key="line_x")
-            else:
-                options['x'] = st.selectbox("Oś X:", ["Indeks"] + numeric_cols, key="line_x")
-            
-            options['y'] = st.multiselect(
-                "Oś Y (numeryczne):", 
-                numeric_cols, 
-                default=[numeric_cols[0]] if numeric_cols else [],
-                key="line_y"
-            )
-        
         elif chart_type == 'Wykres punktowy':
             if len(numeric_cols) < 2:
                 st.warning("Wykres punktowy wymaga co najmniej dwóch kolumn numerycznych.")
@@ -182,18 +159,7 @@ class VisualizationModule:
                     [None] + categorical_cols, 
                     key="box_x"
                 )
-        
-        elif chart_type == 'Mapa cieplna':
-            if len(numeric_cols) < 2:
-                st.warning("Mapa cieplna wymaga co najmniej dwóch kolumn numerycznych.")
-                return None
-            
-            options['columns'] = st.multiselect(
-                "Wybierz kolumny:", 
-                numeric_cols,
-                default=numeric_cols[:min(10, len(numeric_cols))],
-                key="heatmap_cols"
-            )
+    
         
         elif chart_type == 'Wykres skrzypcowy':
             if not numeric_cols:
@@ -237,40 +203,6 @@ class VisualizationModule:
                                  title=f"Liczność wystąpień: {x_col}")
         
         fig.update_layout(height=500)
-        return fig
-    
-    def _create_line_chart(self, df: pd.DataFrame, options: dict):
-        """Tworzy wykres liniowy"""
-        x_col = options['x']
-        y_cols = options['y']
-        
-        if not y_cols:
-            return None
-        
-        if x_col == "Indeks":
-            x_data = df.index
-            x_title = "Indeks"
-        else:
-            x_data = df[x_col]
-            x_title = x_col
-        
-        fig = go.Figure()
-        
-        for y_col in y_cols:
-            fig.add_trace(go.Scatter(
-                x=x_data,
-                y=df[y_col],
-                mode='lines+markers',
-                name=y_col
-            ))
-        
-        fig.update_layout(
-            title=f"Wykres liniowy: {', '.join(y_cols)} w czasie",
-            xaxis_title=x_title,
-            yaxis_title="Wartość",
-            height=500
-        )
-        
         return fig
     
     def _create_scatter_plot(self, df: pd.DataFrame, options: dict):
@@ -337,27 +269,6 @@ class VisualizationModule:
             x=x_col, 
             y=y_col,
             title=f"Wykres pudełkowy: {y_col}" + (f" według {x_col}" if x_col else ""),
-            height=500
-        )
-        
-        return fig
-    
-    def _create_heatmap(self, df: pd.DataFrame, options: dict):
-        """Tworzy mapę cieplną"""
-        columns = options['columns']
-        
-        if len(columns) < 2:
-            return None
-        
-        corr_matrix = df[columns].corr()
-        
-        fig = px.imshow(
-            corr_matrix,
-            text_auto=True,
-            aspect="auto",
-            title="Mapa cieplna korelacji",
-            color_continuous_scale="RdBu",
-            range_color=[-1, 1],
             height=500
         )
         
