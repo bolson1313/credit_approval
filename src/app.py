@@ -5,6 +5,120 @@ from processing import ProcessingModule
 from visualization import VisualizationModule
 from utils import load_data, initialize_session_state, paginate_dataframe
 
+def get_feature_descriptions():
+    """Zwraca słownik z opisami cech dla datasetu Credit Approval"""
+    return {
+        'A1': {
+            'name': 'Płeć',
+            'description': 'Płeć wnioskodawcy (a/b)',
+            'values': 'a, b'
+        },
+        'A2': {
+            'name': 'Wiek',
+            'description': 'Wiek wnioskodawcy',
+            'values': 'wartość numeryczna'
+        },
+        'A3': {
+            'name': 'Stosunek_zadłużenia',
+            'description': 'Stosunek zadłużenia wnioskodawcy',
+            'values': 'wartość numeryczna'
+        },
+        'A4': {
+            'name': 'Status_cywilny',
+            'description': 'Status cywilny wnioskodawcy',
+            'values': 'u, y, l, t'
+        },
+        'A5': {
+            'name': 'Typ_klienta_banku',
+            'description': 'Typ klienta banku',
+            'values': 'g, p, gg'
+        },
+        'A6': {
+            'name': 'Poziom_wykształcenia',
+            'description': 'Poziom wykształcenia wnioskodawcy',
+            'values': 'c, d, cc, i, j, k, m, r, q, w, x, e, aa, ff'
+        },
+        'A7': {
+            'name': 'Branża_zatrudnienia',
+            'description': 'Branża zatrudnienia wnioskodawcy',
+            'values': 'v, h, bb, j, n, z, dd, ff, o'
+        },
+        'A8': {
+            'name': 'Staż_zatrudnienia',
+            'description': 'Staż zatrudnienia wnioskodawcy',
+            'values': 'wartość numeryczna'
+        },
+        'A9': {
+            'name': 'Ma_rachunek_RO',
+            'description': 'Czy wnioskodawca ma rachunek RO',
+            'values': 't (tak), f (nie)'
+        },
+        'A10': {
+            'name': 'Ma_rachunek_OS',
+            'description': 'Czy wnioskodawca ma rachunek OS',
+            'values': 't (tak), f (nie)'
+        },
+        'A11': {
+            'name': 'Liczba_aktywnych_kredytów',
+            'description': 'Liczba aktywnych kredytów wnioskodawcy',
+            'values': 'wartość numeryczna'
+        },
+        'A12': {
+            'name': 'Posiada_inne_zobowiązania',
+            'description': 'Czy wnioskodawca posiada inne zobowiązania',
+            'values': 't (tak), f (nie)'
+        },
+        'A13': {
+            'name': 'Cel_kredytu',
+            'description': 'Cel kredytu wnioskodawcy',
+            'values': 'g, p, s'
+        },
+        'A14': {
+            'name': 'Długość_historii_kredytowej',
+            'description': 'Długość historii kredytowej wnioskodawcy',
+            'values': 'wartość numeryczna'
+        },
+        'A15': {
+            'name': 'Roczny_dochód',
+            'description': 'Roczny dochód wnioskodawcy',
+            'values': 'wartość numeryczna'
+        },
+        'A16': {
+            'name': 'Decyzja_przyznania_kredytu',
+            'description': 'Decyzja przyznania kredytu',
+            'values': '+ (przyznano), - (odmówiono)'
+        }
+    }
+
+def show_feature_descriptions():
+    """Wyświetla tabelę z opisami cech"""
+    st.markdown("### 📋 Opis cech datasetu Credit Approval")
+    
+    descriptions = get_feature_descriptions()
+    
+    # Przygotuj dane do tabeli
+    table_data = []
+    for code, info in descriptions.items():
+        table_data.append({
+            'Kod cechy': code,
+            'Proponowana nazwa': info['name'],
+            'Opis': info['description'],
+            'Możliwe wartości': info['values']
+        })
+    
+    # Wyświetl tabelę
+    df_descriptions = pd.DataFrame(table_data)
+    st.dataframe(df_descriptions, use_container_width=True, hide_index=True)
+    
+    st.markdown("""
+    **ℹ️ Informacje dodatkowe:**
+    - Dataset pochodzi z UCI Machine Learning Repository
+    - Wszystkie nazwy atrybutów i wartości zostały zmienione na bezsensu symbole w celu ochrony poufności
+    - Zawiera 690 instancji z 15 atrybutami + klasą
+    - 37 przypadków (5%) ma brakujące wartości
+    - Rozkład klas: + (przyznano): 307 (44.5%), - (odmówiono): 383 (55.5%)
+    """)
+
 def main():
     st.set_page_config(
         page_title="Analiza Danych - Streamlit App",
@@ -13,6 +127,17 @@ def main():
     )
     
     st.title("📊 Aplikacja do Analizy Danych")
+    
+    # Checkbox w górnej części dla opisu cech
+    show_descriptions = st.checkbox(
+        "📖 Pokaż opis cech datasetu", 
+        help="Wyświetl tabelę z opisem wszystkich kolumn w datasecie Credit Approval"
+    )
+    
+    if show_descriptions:
+        show_feature_descriptions()
+        st.markdown("---")
+    
     st.markdown("---")
     
     # Inicjalizacja session state

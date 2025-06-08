@@ -9,12 +9,30 @@ from utils import get_numeric_columns, get_categorical_columns
 class VisualizationModule:
     def __init__(self):
         self.chart_types = {
-            'Wykres słupkowy': self._create_bar_chart,
-            'Wykres punktowy': self._create_scatter_plot,
-            'Wykres kołowy': self._create_pie_chart,
-            'Histogram': self._create_histogram,
-            'Wykres pudełkowy': self._create_box_plot,
-            'Wykres skrzypcowy': self._create_violin_plot
+            'Wykres słupkowy': {
+                'function': self._create_bar_chart,
+                'help': 'Pokazuje rozkład kategorii lub porównuje wartości między grupami. Idealny do porównywania liczebności lub średnich wartości.'
+            },
+            'Wykres punktowy': {
+                'function': self._create_scatter_plot,
+                'help': 'Pokazuje związek między dwiema zmiennymi numerycznymi. Pomocny w identyfikacji korelacji, trendów i outlierów.'
+            },
+            'Wykres kołowy': {
+                'function': self._create_pie_chart,
+                'help': 'Pokazuje proporcje części względem całości. Najlepszy dla maksymalnie 5-7 kategorii z wyraźnymi różnicami.'
+            },
+            'Histogram': {
+                'function': self._create_histogram,
+                'help': 'Pokazuje rozkład wartości zmiennej numerycznej. Pozwala ocenić normalność, skośność i obecność wartości odstających.'
+            },
+            'Wykres pudełkowy': {
+                'function': self._create_box_plot,
+                'help': 'Pokazuje medianę, kwartyle i outliers. Idealny do porównywania rozkładów między grupami i identyfikacji wartości odstających.'
+            },
+            'Wykres skrzypcowy': {
+                'function': self._create_violin_plot,
+                'help': 'Łączy box plot z wykresem gęstości. Pokazuje pełny kształt rozkładu danych oraz outliers.'
+            }
         }
     
     def render(self, df: pd.DataFrame):
@@ -35,12 +53,17 @@ class VisualizationModule:
         col1, col2 = st.columns([1, 3])
         
         with col1:
-            # Wybór typu wykresu
+            # Wybór typu wykresu z pomocą
             chart_type = st.selectbox(
                 "Wybierz typ wykresu:",
                 list(self.chart_types.keys()),
-                key="chart_type"
+                key="chart_type",
+                help="Wybierz typ wykresu odpowiedni dla Twoich danych"
             )
+            
+            # Wyświetl pomoc dla wybranego wykresu
+            if chart_type:
+                st.info(f"💡 **{chart_type}**: {self.chart_types[chart_type]['help']}")
         
         with col2:
             # Dynamiczne opcje w zależności od typu wykresu
@@ -51,7 +74,7 @@ class VisualizationModule:
         if chart_options:
             # Tworzenie wykresu
             try:
-                fig = self.chart_types[chart_type](df, chart_options)
+                fig = self.chart_types[chart_type]['function'](df, chart_options)
                 if fig:
                     st.plotly_chart(fig, use_container_width=True)
                     
@@ -74,47 +97,100 @@ class VisualizationModule:
         
         if chart_type == 'Wykres słupkowy':
             if not categorical_cols:
-                st.warning("Wykres słupkowy wymaga kolumn kategorycznych.")
+                st.warning("⚠️ Wykres słupkowy wymaga kolumn kategorycznych.")
+                st.info("💡 Spróbuj przekonwertować niektóre kolumny na kategoryczne w zakładce Przetwarzanie.")
                 return None
             
-            options['x'] = st.selectbox("Oś X (kategoryczna):", categorical_cols, key="bar_x")
+            # Domyślnie wybierz pierwszą kolumnę kategoryczną
+            default_x_index = 0
+            options['x'] = st.selectbox(
+                "Oś X (kategoryczna):", 
+                categorical_cols, 
+                index=default_x_index,
+                key="bar_x",
+                help="Wybierz kolumnę kategoryczną dla osi X"
+            )
+            
             if numeric_cols:
-                options['y'] = st.selectbox("Oś Y (numeryczna):", numeric_cols, key="bar_y")
+                # Domyślnie wybierz pierwszą kolumnę numeryczną
+                default_y_index = 0
+                options['y'] = st.selectbox(
+                    "Oś Y (numeryczna):", 
+                    numeric_cols, 
+                    index=default_y_index,
+                    key="bar_y",
+                    help="Wybierz kolumnę numeryczną do agregacji (średnia)"
+                )
             else:
                 options['y'] = None  # Liczenie wystąpień
+                st.info("ℹ️ Brak kolumn numerycznych - zostanie pokazana liczebność kategorii")
             
             if len(categorical_cols) > 1:
+                # Filtruj opcje kolorów - usuń już wybraną kolumnę X
+                color_options = [None] + [col for col in categorical_cols if col != options['x']]
                 options['color'] = st.selectbox(
                     "Kolor (opcjonalne):", 
-                    [None] + categorical_cols, 
-                    key="bar_color"
+                    color_options, 
+                    index=0,  # Domyślnie None
+                    key="bar_color",
+                    help="Dodatkowe grupowanie według kolumny kategorycznej"
                 )
         
         elif chart_type == 'Wykres punktowy':
             if len(numeric_cols) < 2:
-                st.warning("Wykres punktowy wymaga co najmniej dwóch kolumn numerycznych.")
+                st.warning("⚠️ Wykres punktowy wymaga co najmniej dwóch kolumn numerycznych.")
+                st.info("💡 Upewnij się, że masz dane numeryczne lub przekonwertuj tekst na liczby.")
                 return None
             
-            options['x'] = st.selectbox("Oś X:", numeric_cols, key="scatter_x")
-            options['y'] = st.selectbox("Oś Y:", numeric_cols, key="scatter_y")
+            # Domyślnie wybierz pierwszą kolumnę dla X
+            default_x_index = 0
+            options['x'] = st.selectbox(
+                "Oś X:", 
+                numeric_cols, 
+                index=default_x_index,
+                key="scatter_x",
+                help="Zmienna niezależna (objaśniająca)"
+            )
+            
+            # Domyślnie wybierz drugą kolumnę dla Y (różną od X)
+            y_options = [col for col in numeric_cols if col != options['x']]
+            default_y_index = 0 if y_options else 0
+            options['y'] = st.selectbox(
+                "Oś Y:", 
+                y_options if y_options else numeric_cols, 
+                index=default_y_index,
+                key="scatter_y",
+                help="Zmienna zależna (objaśniana)"
+            )
             
             if len(numeric_cols) > 2:
+                # Opcje rozmiaru - wykluczamy już wybrane X i Y
+                size_options = [None] + [col for col in numeric_cols if col not in [options['x'], options['y']]]
+                default_size_index = 1 if len(size_options) > 1 else 0  # Wybierz pierwszą dostępną
                 options['size'] = st.selectbox(
                     "Rozmiar (opcjonalne):", 
-                    [None] + numeric_cols, 
-                    key="scatter_size"
+                    size_options, 
+                    index=default_size_index,
+                    key="scatter_size",
+                    help="Trzeci wymiar - rozmiar punktów według wartości"
                 )
             
             if categorical_cols:
+                # Domyślnie wybierz pierwszą kolumnę kategoryczną
+                color_options = [None] + categorical_cols
+                default_color_index = 1 if len(color_options) > 1 else 0
                 options['color'] = st.selectbox(
                     "Kolor (opcjonalne):", 
-                    [None] + categorical_cols, 
-                    key="scatter_color"
+                    color_options, 
+                    index=default_color_index,
+                    key="scatter_color",
+                    help="Kolorowanie punktów według kategorii"
                 )
         
         elif chart_type == 'Wykres kołowy':
             if not categorical_cols:
-                st.warning("Wykres kołowy wymaga kolumn kategorycznych.")
+                st.warning("⚠️ Wykres kołowy wymaga kolumn kategorycznych.")
+                st.info("💡 Wybierz kolumnę z kategoriami, której rozkład chcesz pokazać.")
                 return None
             
             # TYLKO kategoryczne - filtruj kolumny żeby pokazać tylko kategoryczne
@@ -124,55 +200,105 @@ class VisualizationModule:
                 st.warning("Brak dostępnych kolumn kategorycznych.")
                 return None
             
+            # Domyślnie wybierz pierwszą dostępną kolumnę kategoryczną
+            default_names_index = 0
             options['names'] = st.selectbox(
                 "Kategorie:", 
                 available_categorical, 
+                index=default_names_index,
                 key="pie_names",
-                help="Dostępne tylko kolumny kategoryczne (tekstowe)"
+                help="Kolumna kategoryczna do podziału na segmenty koła"
             )
+            
+            # Sprawdź liczbę unikalnych wartości
+            if options['names']:
+                unique_count = df[options['names']].nunique()
+                if unique_count > 10:
+                    st.warning(f"⚠️ Kolumna ma {unique_count} unikalnych wartości. Wykres może być nieczytelny.")
+                    st.info("💡 Rozważ grupowanie rzadkich kategorii przed utworzeniem wykresu.")
         
         elif chart_type == 'Histogram':
             if not numeric_cols:
-                st.warning("Histogram wymaga kolumn numerycznych.")
+                st.warning("⚠️ Histogram wymaga kolumn numerycznych.")
+                st.info("💡 Histogram pokazuje rozkład wartości liczbowych.")
                 return None
             
-            options['x'] = st.selectbox("Kolumna:", numeric_cols, key="hist_x")
-            options['bins'] = st.slider("Liczba przedziałów:", 10, 100, 30, key="hist_bins")
+            # Domyślnie wybierz pierwszą kolumnę numeryczną
+            default_x_index = 0
+            options['x'] = st.selectbox(
+                "Kolumna:", 
+                numeric_cols, 
+                index=default_x_index,
+                key="hist_x",
+                help="Zmienna numeryczna do analizy rozkładu"
+            )
+            options['bins'] = st.slider(
+                "Liczba przedziałów:", 
+                10, 100, 30, 
+                key="hist_bins",
+                help="Więcej przedziałów = bardziej szczegółowy rozkład"
+            )
             
             if categorical_cols:
+                # Domyślnie bez podziału kolorowego
                 options['color'] = st.selectbox(
                     "Podział według (opcjonalne):", 
                     [None] + categorical_cols, 
-                    key="hist_color"
+                    index=0,
+                    key="hist_color",
+                    help="Porównaj rozkłady między grupami"
                 )
         
         elif chart_type == 'Wykres pudełkowy':
             if not numeric_cols:
-                st.warning("Wykres pudełkowy wymaga kolumn numerycznych.")
+                st.warning("⚠️ Wykres pudełkowy wymaga kolumn numerycznych.")
+                st.info("💡 Box plot pokazuje medianę, kwartyle i wartości odstające.")
                 return None
             
-            options['y'] = st.selectbox("Kolumna numeryczna:", numeric_cols, key="box_y")
+            # Domyślnie wybierz pierwszą kolumnę numeryczną
+            default_y_index = 0
+            options['y'] = st.selectbox(
+                "Kolumna numeryczna:", 
+                numeric_cols, 
+                index=default_y_index,
+                key="box_y",
+                help="Zmienna do analizy rozkładu i outlierów"
+            )
             
             if categorical_cols:
+                # Domyślnie bez grupowania
                 options['x'] = st.selectbox(
                     "Grupowanie według (opcjonalne):", 
                     [None] + categorical_cols, 
-                    key="box_x"
+                    index=0,
+                    key="box_x",
+                    help="Porównaj rozkłady między grupami kategorycznymi"
                 )
-    
         
         elif chart_type == 'Wykres skrzypcowy':
             if not numeric_cols:
-                st.warning("Wykres skrzypcowy wymaga kolumn numerycznych.")
+                st.warning("⚠️ Wykres skrzypcowy wymaga kolumn numerycznych.")
+                st.info("💡 Violin plot łączy box plot z wykresem gęstości.")
                 return None
             
-            options['y'] = st.selectbox("Kolumna numeryczna:", numeric_cols, key="violin_y")
+            # Domyślnie wybierz pierwszą kolumnę numeryczną
+            default_y_index = 0
+            options['y'] = st.selectbox(
+                "Kolumna numeryczna:", 
+                numeric_cols, 
+                index=default_y_index,
+                key="violin_y",
+                help="Zmienna do analizy kształtu rozkładu"
+            )
             
             if categorical_cols:
+                # Domyślnie bez grupowania
                 options['x'] = st.selectbox(
                     "Grupowanie według (opcjonalne):", 
                     [None] + categorical_cols, 
-                    key="violin_x"
+                    index=0,
+                    key="violin_x",
+                    help="Porównaj kształty rozkładów między grupami"
                 )
         
         return options
@@ -188,11 +314,11 @@ class VisualizationModule:
             if color_col:
                 agg_df = df.groupby([x_col, color_col])[y_col].mean().reset_index()
                 fig = px.bar(agg_df, x=x_col, y=y_col, color=color_col, 
-                           title=f"Wykres słupkowy: {y_col} według {x_col}")
+                           title=f"Wykres słupkowy: Średnia {y_col} według {x_col}")
             else:
                 agg_df = df.groupby(x_col)[y_col].mean().reset_index()
                 fig = px.bar(agg_df, x=x_col, y=y_col, 
-                           title=f"Wykres słupkowy: {y_col} według {x_col}")
+                           title=f"Wykres słupkowy: Średnia {y_col} według {x_col}")
         else:
             # Liczenie wystąpień
             if color_col:
@@ -221,6 +347,10 @@ class VisualizationModule:
             title=f"Wykres punktowy: {y_col} vs {x_col}",
             height=500
         )
+        
+        # Dodaj linię trendu jeśli brak kategorii kolorowych
+        if not color_col:
+            fig.add_traces(px.scatter(df, x=x_col, y=y_col, trendline="ols").data[1:])
         
         return fig
     
@@ -257,6 +387,11 @@ class VisualizationModule:
             height=500
         )
         
+        # Dodaj linię średniej
+        mean_val = df[x_col].mean()
+        fig.add_vline(x=mean_val, line_dash="dash", line_color="red", 
+                     annotation_text=f"Średnia: {mean_val:.2f}")
+        
         return fig
     
     def _create_box_plot(self, df: pd.DataFrame, options: dict):
@@ -284,7 +419,8 @@ class VisualizationModule:
             x=x_col, 
             y=y_col,
             title=f"Wykres skrzypcowy: {y_col}" + (f" według {x_col}" if x_col else ""),
-            height=500
+            height=500,
+            box=True  # Dodaj box plot wewnątrz
         )
         
         return fig
@@ -336,7 +472,8 @@ class VisualizationModule:
                 "Wybierz kolumny (max 5):",
                 numeric_cols,
                 default=numeric_cols[:min(4, len(numeric_cols))],
-                key="scatter_matrix_cols"
+                key="scatter_matrix_cols",
+                help="Macierz pokazuje związki między wszystkimi parami zmiennych"
             )
             
             if len(selected_cols) >= 2:
