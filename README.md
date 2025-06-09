@@ -37,23 +37,31 @@ Peter,35,Gdansk,7000,IT
 ```bash
 git clone <repo-url>
 ```
+2. **Utwórz wirtualne środowisko**:
+```bash
+python -m venv .venv
+```
+**oraz aktywuj w zależności od shella**:
+```bash
+./.venv/Scripts/activate.bat
+```
 
-2. **Zainstaluj zależności**:
+3. **Zainstaluj zależności**:
 ```bash
 pip install -r requirements.txt
 ```
 
-3. **Uruchom aplikację przez przegladarke**:
+4. **Uruchom aplikację przez przegladarke**:
 ```bash
 streamlit run src/pp.py
 ```
 
-4. **Uruchom aplikacje w trybie desktopowym**:
+5. **Uruchom aplikacje w trybie desktopowym**:
 ```bash
 python src/main.py
 ```
 
-4. **Tworzenie pliku exe**:
+6. **Tworzenie pliku exe**:
 ```bash
 pyinstaller --onefile --clean --add-binary ".venv/Scripts/streamlit.exe;." --add-data "src;src" src/main.py #plik binarny zostanie stworzony w katalogu dist
 ```
