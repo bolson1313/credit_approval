@@ -36,7 +36,6 @@ Peter,35,Gdansk,7000,IT
 1. **Klonuj repozytorium**:
 ```bash
 git clone <repo-url>
-cd streamlit-data-analysis
 ```
 
 2. **Zainstaluj zależności**:
@@ -44,11 +43,20 @@ cd streamlit-data-analysis
 pip install -r requirements.txt
 ```
 
-3. **Uruchom aplikację**:
+3. **Uruchom aplikację przez przegladarke**:
 ```bash
-streamlit run app.py
+streamlit run src/pp.py
 ```
 
+4. **Uruchom aplikacje w trybie desktopowym**:
+```bash
+python src/main.py
+```
+
+4. **Tworzenie pliku exe**:
+```bash
+pyinstaller --onefile --clean --add-binary ".venv/Scripts/streamlit.exe;." --add-data "src;src" src/main.py #plik binarny zostanie stworzony w katalogu dist
+```
 ## 📁 Struktura projektu
 
 ```
