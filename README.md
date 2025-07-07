@@ -117,7 +117,7 @@ streamlit-data-analysis/
 - Usuń wiersze/kolumny z brakami
 - Wypełnij średnią, medianą lub własną wartością
 
-## ⚙Rozszerzenia
+## Rozszerzenia
 
 Aplikacja została zaprojektowana modularnie - łatwo dodać nowe funkcjonalności:
 
