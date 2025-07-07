@@ -11,13 +11,13 @@ Peter,35,Gdansk,7000,IT
 ```
 
 
-### 📈 Statystyki
+### Statystyki
 - **Wczytywanie plików CSV** z paginacją i filtrowaniem
 - **Statystyki opisowe** dla danych numerycznych i kategorycznych
 - **Analiza korelacji** (Pearson, Spearman)
 - **Interaktywne histogramy** i mapy cieplne
 
-### 🔧 Przetwarzanie
+### Przetwarzanie
 - **Ekstrakcja podtablic** - usuwanie/zachowywanie wierszy i kolumn
 - **Zastępowanie wartości** - manualne i automatyczne
 - **Skalowanie danych** - MinMaxScaler, StandardScaler
@@ -25,13 +25,13 @@ Peter,35,Gdansk,7000,IT
 - **Usuwanie duplikatów**
 - **Kodowanie zmiennych kategorycznych** - One-Hot, Binary, Label Encoding
 
-### 📊 Wizualizacje
+### Wizualizacje
 - **8 typów wykresów**: słupkowy, liniowy, punktowy, kołowy, histogram, pudełkowy, mapa cieplna, skrzypcowy
 - **Interaktywne wykresy** z Plotly
 - **Macierz wykresów punktowych**
 - **Wykresy porównawcze**
 
-## 🛠️ Instalacja
+## Instalacja
 
 1. **Klonuj repozytorium**:
 ```bash
@@ -65,7 +65,7 @@ python src/main.py
 ```bash
 pyinstaller --onefile --clean --add-binary ".venv/Scripts/streamlit.exe;." --add-data "src;src" src/main.py #plik binarny zostanie stworzony w katalogu dist
 ```
-## 📁 Struktura projektu
+## Struktura projektu
 
 ```
 streamlit-data-analysis/
@@ -80,7 +80,7 @@ streamlit-data-analysis/
     └── visualization.py  # Moduł wizualizacji
 ```
 
-## 📋 Wymagania systemowe
+## Wymagania systemowe
 
 - Python 3.8+
 - Streamlit 1.28.0+
@@ -90,7 +90,7 @@ streamlit-data-analysis/
 - Scikit-learn 1.3.0+
 - SciPy 1.10.0+
 
-## 🎯 Jak używać
+## Jak używać
 
 1. **Uruchom aplikację** za pomocą `streamlit run app.py`
 2. **Wczytaj plik CSV** w panelu bocznym
@@ -98,7 +98,7 @@ streamlit-data-analysis/
 4. **Przetwarzaj dane** w zakładce "Przetwarzanie"
 5. **Twórz wizualizacje** w zakładce "Wizualizacje"
 
-## 📊 Przykłady użycia
+## Przykłady użycia
 
 ### Ekstrakcja podtablic
 - Usuń wiersze: `1,3,5` lub `1-5` lub `1,3-5,7`
@@ -117,7 +117,7 @@ streamlit-data-analysis/
 - Usuń wiersze/kolumny z brakami
 - Wypełnij średnią, medianą lub własną wartością
 
-## ⚙️ Rozszerzenia
+## ⚙Rozszerzenia
 
 Aplikacja została zaprojektowana modularnie - łatwo dodać nowe funkcjonalności:
 
